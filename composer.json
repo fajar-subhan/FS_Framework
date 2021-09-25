@@ -1,0 +1,19 @@
+{
+    "name": "fajar_subhan/framework",
+    "description": "A framework that can be redeveloped.Only uses the concept of php oop mvc",
+    "license": "MIT",
+    "type": "framework",
+    "version": "1.0.0",
+    "authors": [{
+        "name": "Fajar Subhan",
+        "email": "fajarsubhan9b@gmail.com"
+    }],
+    "require": {
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app/"
+        }
+    }
+}
