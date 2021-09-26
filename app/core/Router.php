@@ -53,6 +53,16 @@ class Router
         return $this->request->getURL();
     }
     
+    /**
+     * This function is useful for getting controller/method/params these three things get from HTTP Request.
+     * Example : segment 1 Controller / Segment 2 Method / Segment 3 Params.
+     * And will return a callback function to the specified file
+     * 
+     * @return callback 
+     * @var $this->controller segment 1
+     * @var $this->method     segment 2
+     * @var $this->params     segment 3
+     */
     public function resolve()
     {
         try 
