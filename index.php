@@ -46,5 +46,12 @@ $dotenv->load();
 |
 */
 $request = new Request();
-$app = new App($request);
+
+$setup = 
+[
+    'request'   => $request,
+    'env'       => $_ENV
+];
+
+$app = new App($setup);
 $app->run();

@@ -36,12 +36,20 @@ class App
      */
     public static $controller;
 
-    public function __construct($request)
+    /**
+     * @var object database
+     */
+    public static $database;
+
+    public static $env;
+
+    public function __construct($setup)
     {
         self::$controller   = new Controller();
         self::$view         = new View();
         self::$app          = $this;
-        $this->request      = $request;
+        self::$env          = $setup['env'];
+        $this->request      = $setup['request'];
         $this->router       = new Router($this->request);
     }
 

@@ -2,6 +2,7 @@
 namespace app\core;
 
 use App\Core\App;
+use app\core\exception\BaseException;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,13 @@ class Controller
      * @var string $layout
      */
     public $layout = "template";
+
+    /**
+     * Contains the model to be loaded
+     * 
+     * @var string $load
+     */
+    public $load;
 
     public function setLayout($layout)
     {
@@ -46,6 +54,34 @@ class Controller
     public function layoutView($view,$params = [])
     {
         echo App::$view->renderView($view,$params);
+    }
+
+    /**
+     * To connect to the model class
+     * 
+     * @param string $name_model
+     */
+    public function model($name_model)
+    {
+        try 
+        {
+            $this->load = "app\models\\" . $name_model . ".php";
+            if(file_exists($this->load))
+            {
+                require_once $this->load;
+                $this->load = str_replace(".php","",$this->load);
+                return new $this->load;
+            }
+            else 
+            {
+                throw new BaseException("Model $name_model not found",404);
+            }
+        }
+        catch(BaseException $e)
+        {
+            BaseException::getException($e);
+        }
+
     }
 
 }
