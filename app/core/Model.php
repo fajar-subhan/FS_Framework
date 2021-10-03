@@ -461,21 +461,22 @@ class Model extends Database
         $array_keys     = array_keys($data);
         $array_values   = array_values($data);
 
+
         $field  = implode(',',$array_keys);
         $values = str_repeat('?,',count($array_values)-1) . "?";
 
         $sql = "INSERT INTO $table_name ($field) VALUES ($values)";
-
-        $this->num_rows = $this->run_insert($sql,$array_values)->rowCount();
+        
+        $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
 
     /**
-     * This function is used to run an insert query to the database
+     * This function is used to run the query
      * 
      * @param string $query
      * @param array  $bindValue
      */
-    public function run_insert($query,$bindValue = [])
+    public function run_query($query,$bindValue = [])
     {
         try 
         {
@@ -503,6 +504,44 @@ class Model extends Database
         {
             $this->set[$field] = $value;
         }
+    }
+    
+    /**
+     * Generates an update string and runs the query based on the data you supply. 
+     * 
+     * @param string $table_name
+     * @param array $data
+     */
+    public function update($table_name = "",$data = [])
+    {
+        if(empty($data))
+        {
+            foreach($this->set as $key => $value)
+            {
+                $set[$key] = $key . " = ?";
+            }
+            
+            $array_values = array_values(array_merge($this->set,$this->where));
+        }
+        else 
+        {
+            foreach($data as $key => $value)
+            {
+                $set[$key] = $key . " = ?"; 
+            }
+
+            $array_values = array_values(array_merge($data,$this->where));
+        }
+
+        foreach($this->where as $key => $value)
+        {
+            $where[] = $key . " = ?";
+        }
+
+        $sql  = "UPDATE $table_name SET " . implode(",",$set);
+        $sql .= " WHERE " . implode('',$where);
+
+        $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
     
 }
