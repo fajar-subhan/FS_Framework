@@ -46,15 +46,6 @@ class Model extends Database
     private $result_array;
 
     /**
-     * Run Select
-     * 
-     * Execute a select query
-     * 
-     * @var object $run_select
-     */
-    private $run_select;
-
-    /**
      * Num Rows
      * 
      * Counting records rows 
@@ -63,6 +54,31 @@ class Model extends Database
      */
     private $num_rows = 0;
 
+    /**
+     * Where 
+     * 
+     * Generate the WHERE
+     * 
+     * @var array $where
+     */
+    private $where;
+
+    /**
+     * This function enables you to set values for inserts or updates.
+     * 
+     * @var array $set
+     */
+    private $set;
+
+    /** 
+     * WHERE IN
+	 *
+	 * Generates a WHERE field IN('item', 'item') SQL query,
+	 * joined with 'AND' if appropriate.
+     * 
+     * @var array $where_in
+     */
+    private $where_in;
 
     public function __construct()
     {
@@ -97,7 +113,7 @@ class Model extends Database
      * 
      * Create a select query
      * 
-     * SELECT | FIELD | FROM 
+     * SELECT | FIELD | FROM  | WHERE | WHERE IN 
      * 
      * @return string $sql
      */
@@ -126,7 +142,7 @@ class Model extends Database
         */
 
         // --------------------------------------------------------------------------------
-
+        
         /**
          * Start FROM {table_name}
          */
@@ -148,6 +164,97 @@ class Model extends Database
         /**
          * End FROM {table_name}
          */
+        
+        // --------------------------------------------------------------------------------
+        
+        /**
+         * Start Where 
+         */
+        if(!empty($this->where))
+        {
+            if(count($this->where) === 1)
+            {
+                $sql .= " WHERE ";
+    
+                foreach($this->where as $field => $value)
+                {
+                    $where[] = $field . " = '$value'";
+                }
+    
+                $sql .= implode(" ",$where);
+            }
+            
+            if(count($this->where) > 1)
+            {
+                $sql .= " WHERE ";
+    
+                foreach($this->where as $key => $value)
+                {
+                    $where[]  = " $key = '$value'";
+                }
+    
+                $sql .= implode(" AND ",$where);
+            }
+        }
+
+        /**
+         * End Where 
+         */
+
+        // --------------------------------------------------------------------------------
+
+        /**
+         * Start Where IN
+         */
+        if(empty($this->where))
+        {
+            if(count($this->where_in) === 1)
+            {
+                $sql .= " WHERE ";
+
+                foreach($this->where_in as $key => $value)
+                {
+                    $where_in[] = $value;
+                }
+
+                $sql .= implode("",$where_in);
+            }
+            else if(count($this->where_in) > 1)
+            {
+                $sql .= " WHERE ";
+                foreach($this->where_in as $key => $value)
+                {
+                    $where_in[] = $value;
+                }
+
+                $sql .= implode(" AND ",$where_in);
+            }
+        }
+        else 
+        {
+            if(count($this->where_in) === 1)
+            {
+                foreach($this->where_in as $key => $value)
+                {
+                    $where_in[] = $value;
+                }
+
+                $sql .= " AND " . implode("",$where_in);
+            }
+            else if(count($this->where_in) > 1)
+            {
+                foreach($this->where_in as $key => $value)
+                {
+                    $where_in[] = $value;
+                }
+
+                $sql .= " AND " .  implode(" AND ",$where_in);
+            }
+        }
+        
+        /**
+         * End Where IN
+         */
 
         return $sql;
     }
@@ -155,6 +262,7 @@ class Model extends Database
     /**
      * Execute a select query
      * 
+     * @return object
      */
     public function run_select()
     {
@@ -163,7 +271,8 @@ class Model extends Database
             $stmt = $this->conn->prepare($this->compile_select());
             $stmt->execute();
             $this->num_rows     = $stmt->rowCount();
-            $this->run_select   = $stmt;
+
+            return $stmt;
         }
         catch(PDOException $e)
         {
@@ -192,7 +301,7 @@ class Model extends Database
      */
     public function result_array()
     {
-        $this->result_array = $this->run_select->fetchAll(PDO::FETCH_ASSOC);
+        $this->result_array = $this->run_select()->fetchAll(PDO::FETCH_ASSOC);
 
         return $this->result_array;
     }
@@ -210,7 +319,7 @@ class Model extends Database
         {
             $select =  explode(',',$field);
         }
-
+    
         foreach($select as $val)
         {
             $val = trim($val);
@@ -221,7 +330,7 @@ class Model extends Database
             }
         }
 
-        return $this;
+        return $this->field_select;
 
     }
 
@@ -240,10 +349,160 @@ class Model extends Database
     /**
      * To view the currently used query
      * 
+     * @return string 
      */
     public function last_query()
     {
-        return $this->run_select->queryString;
+        return $this->run_select()->queryString;
+    }
+
+    /**
+     * Result All Json
+     * 
+     * Query result. "json" version
+     * 
+     * @return json
+     */
+    public function result_json()
+    {
+        header('Content-Type: application/json');
+        return json_encode($this->result_array());        
+    }
+    
+    /**
+     * Result All Object
+     * 
+     * Query result. "object" version
+     * 
+     * @return object
+     */
+    public function result_object()
+    {
+        return (object)$this->run_select()->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    /**
+     * WHERE
+     * 
+     * Generate the WHERE portion of the query 
+     * Separates multiple call with AND 
+     * 
+     * @param string $field
+     * @param string $value
+     */
+    public function where($field,$value)
+    {
+        if(is_string($field))
+        {
+            $field = [$field => $value];
+        }
+
+        foreach($field as $key => $val)
+        {
+            $this->where[$key] = $val;
+        }
+
+        return $this->where;
+        
+    }   
+
+    /**
+	 * WHERE IN
+	 *
+	 * Generates a WHERE field IN('item', 'item') SQL query,
+     * 
+     * @param string $field
+     * @param array $value
+     */
+    public function where_in($field = "",$value = [])
+    {
+        if(!is_array($value))
+        {
+            $value = array($value);
+        }
+        
+        $where_in = array();
+
+        $i = 0;
+        foreach($value as $val)
+        {
+            $where_in[$i] =  "'$val'";
+            $i++;
+        }
+        
+
+        $value = $field . " IN (" . implode(',',$where_in) . ")"; 
+
+        $this->where_in[] = $value;
+        
+
+        return $this->where_in;
+    }
+
+    /**
+     * INSERT 
+     * 
+     * Generates an insert string based on the data you supply, and runs the query. 
+     * You can either pass an array or an object to the function. Here is an example using an array:
+     * 
+     * @param string $table_name
+     * @param array $data
+     */
+    public function insert($table_name = "",$data = [])
+    {
+        if(empty($data))
+        {
+            foreach($this->set as $key => $value)
+            {
+                $data[$key] = $value;
+            }
+        }
+
+        $array_keys     = array_keys($data);
+        $array_values   = array_values($data);
+
+        $field  = implode(',',$array_keys);
+        $values = str_repeat('?,',count($array_values)-1) . "?";
+
+        $sql = "INSERT INTO $table_name ($field) VALUES ($values)";
+
+        $this->num_rows = $this->run_insert($sql,$array_values)->rowCount();
+    }
+
+    /**
+     * This function is used to run an insert query to the database
+     * 
+     * @param string $query
+     * @param array  $bindValue
+     */
+    public function run_insert($query,$bindValue = [])
+    {
+        try 
+        {
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute($bindValue);
+            $this->num_rows = $stmt->rowCount();
+            
+            return $stmt;
+        }
+        catch(PDOException $e)
+        {
+            BaseException::getException($e);
+        }
+    }
+
+    /**
+     * This function enables you to set values for inserts or updates.
+     * 
+     * @param string $field
+     * @param string $value
+     */
+    public function set($field,$value)
+    {
+        if(is_string($field))
+        {
+            $this->set[$field] = $value;
+        }
     }
     
 }
