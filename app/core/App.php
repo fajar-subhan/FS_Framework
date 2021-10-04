@@ -32,11 +32,6 @@ class App
     public static $view;
 
     /**
-     * @var object controller
-     */
-    public static $controller;
-
-    /**
      * @var object database
      */
     public static $database;
@@ -45,7 +40,6 @@ class App
 
     public function __construct($setup)
     {
-        self::$controller   = new Controller();
         self::$view         = new View();
         self::$app          = $this;
         self::$env          = $setup['env'];

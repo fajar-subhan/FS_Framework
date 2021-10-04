@@ -53,7 +53,7 @@ class Controller
      */
     public function layoutView($view,$params = [])
     {
-        echo App::$view->renderView($view,$params);
+        echo App::$view->renderLayoutView($view,$params);
     }
 
     /**

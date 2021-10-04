@@ -1,6 +1,9 @@
 <?php 
 namespace app\core;
 
+use app\core\exception\BaseException;
+use Exception;
+
 class View 
 {
     /**
@@ -41,13 +44,26 @@ class View
     public function layoutContent()
     {
         /* Default Layout : Template */
-        $layout = App::$controller->layout;
+        try 
+        {
+            $layout = LAYOUT;
 
-        ob_start();
-        require_once  str_replace("\\","/",ROOT_PATH) . "/app/resources/views/layouts/$layout.php"; 
-        $template =  ob_get_clean();
+            if(empty($layout))
+            {
+                throw new Exception('Layout not found',404);
+            }
+            else 
+            {
+                require_once  str_replace("\\","/",ROOT_PATH) . "/app/resources/views/layouts/$layout.php"; 
+                $template =  ob_get_clean();
 
-        return $template;
+                return $template;
+            }
+        }
+        catch(Exception $e)
+        {
+            BaseException::getException($e);
+        }
     }
 
     /**
