@@ -3,7 +3,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/fajar-subhan/FS_Framework">
-    <img src="https://github.com/fajar-subhan/FS_Framework/assets/images/logo.png" alt="Logo" width="80" height="80">
+    <img src="https://github.com/fajar-subhan/FS_Framework/blob/master/assets/images/readme/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">FS Framework</h3>
@@ -42,7 +42,7 @@
 <!-- ABOUT THE FS Framework -->
 ## About The FS Framework
 
-<img src="https://github.com/fajar-subhan/FS_Framework/assets/images/icon.png" alt="Product Name Screen Shot" style="width:100%"></a>
+<img src="https://github.com/fajar-subhan/FS_Framework/blob/master/assets/images/readme/icon.png" alt="Product Name Screen Shot" style="width:100%"></a>
  
 FS Framework is an Application Development Framework - a toolkit - for people building websites using PHP. Its goal is to allow you to develop projects faster than you could if you were writing code from scratch, by providing a rich collection of libraries for common tasks required, as well as a simple interface and logistical structure to access these libraries. With only basic OOP PHP and MVC you can use this framework
 <p align="right">(<a href="#top">back to top</a>)</p>
