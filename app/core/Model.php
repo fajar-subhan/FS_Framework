@@ -543,5 +543,37 @@ class Model extends Database
 
         $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
+
+    /**
+     * Generates a delete SQL string and runs the query.
+     * 
+     * @param string $table_name
+     * @param array $data
+     */
+    public function delete($table_name,$data = [])
+    {
+        if(empty($data))
+        {
+            foreach($this->where as $key => $value)
+            {
+                $set[$key] = $key . " = ?";
+            }
+
+            $array_values = array_values($this->where);
+        }
+        else 
+        {
+            foreach($data as $key => $value)
+            {
+                $set[$key] = $key . " = ?";
+            }
+
+            $array_values = array_values($data);
+        }
+
+        $sql = "DELETE FROM $table_name WHERE " . implode('',$set);
+
+        $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
+    }
     
 }
