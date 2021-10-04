@@ -80,6 +80,15 @@ class Model extends Database
      */
     private $where_in;
 
+    /**
+     * JOIN
+     * 
+     * Permits you to write the JOIN portion of your query
+     * 
+     * @var array $join
+     */
+    private $join;
+
     public function __construct()
     {
         $this->conn = parent::__construct();
@@ -202,63 +211,84 @@ class Model extends Database
          */
 
         // --------------------------------------------------------------------------------
-
+        
         /**
          * Start Where IN
          */
-        if(empty($this->where))
+        if(!is_null($this->where_in))
         {
-            if(count($this->where_in) === 1)
+            if(empty($this->where))
             {
-                $sql .= " WHERE ";
-
-                foreach($this->where_in as $key => $value)
+                if(count($this->where_in) === 1)
                 {
-                    $where_in[] = $value;
+                    $sql .= " WHERE ";
+                    
+                    foreach($this->where_in as $key => $value)
+                    {
+                        $where_in[] = $value;
+                    }
+                    
+                    $sql .= implode("",$where_in);
                 }
-
-                $sql .= implode("",$where_in);
+                else if(count($this->where_in) > 1)
+                {
+                    $sql .= " WHERE ";
+                    foreach($this->where_in as $key => $value)
+                    {
+                        $where_in[] = $value;
+                    }
+                    
+                    $sql .= implode(" AND ",$where_in);
+                }
             }
-            else if(count($this->where_in) > 1)
+            else 
             {
-                $sql .= " WHERE ";
-                foreach($this->where_in as $key => $value)
+                if(count($this->where_in) === 1)
                 {
-                    $where_in[] = $value;
+                    foreach($this->where_in as $key => $value)
+                    {
+                        $where_in[] = $value;
+                    }
+                    
+                    $sql .= " AND " . implode("",$where_in);
                 }
-
-                $sql .= implode(" AND ",$where_in);
-            }
-        }
-        else 
-        {
-            if(count($this->where_in) === 1)
-            {
-                foreach($this->where_in as $key => $value)
+                else if(count($this->where_in) > 1)
                 {
-                    $where_in[] = $value;
+                    foreach($this->where_in as $key => $value)
+                    {
+                        $where_in[] = $value;
+                    }
+                    
+                    $sql .= " AND " .  implode(" AND ",$where_in);
                 }
-
-                $sql .= " AND " . implode("",$where_in);
-            }
-            else if(count($this->where_in) > 1)
-            {
-                foreach($this->where_in as $key => $value)
-                {
-                    $where_in[] = $value;
-                }
-
-                $sql .= " AND " .  implode(" AND ",$where_in);
             }
         }
         
         /**
          * End Where IN
          */
+        
+        // --------------------------------------------------------------------------------
+        
+        /**
+         * Start Join
+         */
+        if(!is_null($this->join))
+        {
+            foreach($this->join as $key => $value)
+            {
+                $join[] = $value;
+            }
+
+            $sql .= implode("",$join);
+        }
+        /**
+         * End Join
+         */
 
         return $sql;
     }
-
+    
     /**
      * Execute a select query
      * 
@@ -576,4 +606,25 @@ class Model extends Database
         $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
     
+    /**
+     * Permits you to write the JOIN portion of your query:
+     * 
+     * @param  string $table_name table name to join
+     * @param  string $condition  the join on condition
+     * @param  string $type       the join type left | right | outer
+     * @return array  $this->join
+     */
+    public function join($table_name,$condition,$type)
+    {
+        if(is_string($condition))
+        {
+            $condition = array($condition);
+        }
+
+        $sql = " " . strtoupper($type) . " JOIN $table_name ON " . implode("",$condition);
+
+        $this->join[] = $sql;
+
+        return $this->join;
+    }
 }

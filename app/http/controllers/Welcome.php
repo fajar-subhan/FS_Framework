@@ -14,13 +14,6 @@ class Welcome extends Controller
 
     public function index()
     {
-        $data = $this->model->_getData();
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
-
-
-
         return $this->onlyView('welcome',[]);
     }
 }
