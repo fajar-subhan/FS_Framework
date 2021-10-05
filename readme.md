@@ -75,12 +75,17 @@ Before starting we prepare a few things first such as config composer, database 
    ```
 3. Rename the .env.example file to .env only
 4. Please fill in the .env file as follows
-```sh
-  DB_DSN  = mysql:host=localhost;dbname=database_name;port:database_port
-  DB_USER = username
-  DB_PASS = password
-```
-5. Happy coding :)
+  ```sh
+    DB_DSN  = mysql:host=localhost;dbname=database_name;port:database_port
+    DB_USER = username
+    DB_PASS = password
+  ```
+5. Define the controller and its layout first in the config/config.php file
+ ```sh
+    if(!defined('LAYOUT')) define('LAYOUT','Layout Name');
+    if(!defined('CONTROLLER')) define('CONTROLLER','Controller Name');
+  ```
+6. Happy coding :)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

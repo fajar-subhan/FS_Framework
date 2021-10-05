@@ -20,7 +20,7 @@ class Router
      * 
      * @var string $controller
      */
-    private $controller = "welcome";
+    private $controller = CONTROLLER;
 
     /**
      * Used to save the default method
