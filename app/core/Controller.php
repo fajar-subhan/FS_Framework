@@ -15,23 +15,11 @@ use app\core\exception\BaseException;
 class Controller 
 {
     /**
-     * This is to put the default layout template to be used
-     * 
-     * @var string $layout
-     */
-    public $layout = "template";
-
-    /**
      * Contains the model to be loaded
      * 
      * @var string $load
      */
     public $load;
-
-    public function setLayout($layout)
-    {
-        $this->layout = $layout;
-    }
 
     /**
      * This is used to display only views, 
