@@ -80,9 +80,8 @@ Before starting we prepare a few things first such as config composer, database 
     DB_USER = username
     DB_PASS = password
   ```
-5. Define the controller and its layout first in the config/config.php file
+5. Define the controller in the config/config.php file
  ```sh
-    if(!defined('LAYOUT')) define('LAYOUT','Layout Name');
     if(!defined('CONTROLLER')) define('CONTROLLER','Controller Name');
   ```
 6. Happy coding :)

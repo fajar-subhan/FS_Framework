@@ -46,7 +46,7 @@ class View
         /* Default Layout : Template */
         try 
         {
-            $layout = LAYOUT;
+            $layout = Controller::$layout;
 
             if(empty($layout))
             {

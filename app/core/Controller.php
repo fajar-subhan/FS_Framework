@@ -22,6 +22,24 @@ class Controller
     public $load;
 
     /**
+     * To give name of template 
+     * 
+     * @var string $layout
+     */
+    public static $layout;
+
+    /**
+     * To give the name of the template or layout to be used on the view
+     *
+     * @param string $layout
+     * @return string $layout
+     */
+    public static function set_layout($layout)
+    {
+        self::$layout = $layout;
+    }
+
+    /**
      * This is used to display only views, 
      * which are in the app/resources/views folder
      * 

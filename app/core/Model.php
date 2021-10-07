@@ -89,6 +89,20 @@ class Model extends Database
      */
     private $join;
 
+    /**
+     * Lets you limit the number of rows 
+     * 
+     * @var string $limit
+     */
+    private $limit;
+
+    /**
+     * Lets you set an ORDER BY clause.
+     * 
+     * @var string $order_by
+     */
+    private $order_by;
+
     public function __construct()
     {
         $this->conn = parent::__construct();
@@ -122,7 +136,7 @@ class Model extends Database
      * 
      * Create a select query
      * 
-     * SELECT | FIELD | FROM  | WHERE | WHERE IN 
+     * SELECT | FIELD | FROM  | WHERE | WHERE IN | JOIN | LIMIT | ORDER BY
      * 
      * @return string $sql
      */
@@ -284,6 +298,32 @@ class Model extends Database
         }
         /**
          * End Join
+         */
+
+         // --------------------------------------------------------------------------------
+
+        /**
+         * Start Order By
+         */
+        if(!is_null($this->order_by))
+        {
+            $sql .= $this->order_by;
+        }
+        /**
+         * End Order By
+         */
+
+        // --------------------------------------------------------------------------------
+        
+        /**
+         * Start Limit
+         */
+        if(!is_null($this->limit))
+        {
+            $sql .= $this->limit;
+        }
+        /**
+         * End Limit
          */
 
         return $sql;
@@ -626,5 +666,68 @@ class Model extends Database
         $this->join[] = $sql;
 
         return $this->join;
+    }
+
+    /**
+     * Lets you limit the number of rows 
+     * 
+     * @param int $value  Number of rows to limit the results to
+     * @param int $offset Number of rows to skip
+     */
+    public function limit($value,$offset = "")
+    {
+        if(!empty($value) && empty($offset))
+        {
+            $this->limit = " LIMIT " . $value;
+        }
+        else if(!empty($value) && !empty($offset))
+        {
+            $this->limit = " LIMIT " . $value . "," . $offset;
+        }
+
+        return $this->limit;
+    }
+
+    /**
+     * Lets you set an ORDER BY clause.
+     *
+     * @param string $orderby   Field to order by
+     * @param string $direction The order requested - ASC, DESC
+     */
+    public function order_by($orderby,$direction)
+    {
+        if(!empty($orderby) && !empty($direction))
+        {
+            $this->order_by = " ORDER BY " . $orderby . " " . $direction;
+        }
+        
+        else if(is_string($orderby) && empty($direction))
+        {
+            $this->order_by = " ORDER BY $orderby";
+        }
+
+        return $this->order_by;
+    } 
+
+    /**
+	 * Reset Query Builder values.
+	 *
+	 * Publicly-visible method to reset the QB values.
+	 *
+     * @return DB_Query_builder
+     */
+    public function reset_select()
+    {
+        $data = array(
+            $this->where    = array(),
+            $this->where_in = array(),
+            $this->order_by = "",
+            $this->limit    = ""
+        );
+
+        foreach($data as $key => $value)
+        {
+            $this->$key =$value;
+        }
     }
 }
