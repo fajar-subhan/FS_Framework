@@ -198,12 +198,12 @@ class Model extends Database
             if(count($this->where) === 1)
             {
                 $sql .= " WHERE ";
-    
+                
                 foreach($this->where as $field => $value)
                 {
-                    $where[] = $field . " = '$value'";
+                    $where[] = $field ." '$value'";
                 }
-    
+                
                 $sql .= implode(" ",$where);
             }
             
@@ -213,7 +213,7 @@ class Model extends Database
     
                 foreach($this->where as $key => $value)
                 {
-                    $where[]  = " $key = '$value'";
+                    $where[]  = $key . " '$value'";
                 }
     
                 $sql .= implode(" AND ",$where);
@@ -440,18 +440,6 @@ class Model extends Database
     }
     
     /**
-     * Result All Object
-     * 
-     * Query result. "object" version
-     * 
-     * @return object
-     */
-    public function result_object()
-    {
-        return (object)$this->run_select()->fetchAll(PDO::FETCH_OBJ);
-    }
-
-    /**
      * WHERE
      * 
      * Generate the WHERE portion of the query 
@@ -462,9 +450,18 @@ class Model extends Database
      */
     public function where($field,$value)
     {
-        if(is_string($field))
+        $x = explode(' ',$field);
+        
+        if(is_array($x) && count($x) > 1)
         {
-            $field = [$field => $value];
+            $field = [implode(' ',$x) => $value];
+        }
+        
+        if(is_array($x) && count($x) == 1)
+        {
+            $opr = [$x[0],"= "];
+
+            $field = [implode(" ",$opr) => $value];
         }
 
         foreach($field as $key => $val)
@@ -475,6 +472,7 @@ class Model extends Database
         return $this->where;
         
     }   
+
 
     /**
 	 * WHERE IN
@@ -597,7 +595,7 @@ class Model extends Database
         {
             foreach($data as $key => $value)
             {
-                $set[$key] = $key . " = ?"; 
+                $set[$key] = $key . " ?"; 
             }
 
             $array_values = array_values(array_merge($data,$this->where));
@@ -605,12 +603,12 @@ class Model extends Database
 
         foreach($this->where as $key => $value)
         {
-            $where[] = $key . " = ?";
+            $where[] = $key . " ?";
         }
 
         $sql  = "UPDATE $table_name SET " . implode(",",$set);
         $sql .= " WHERE " . implode('',$where);
-
+        
         $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
 
