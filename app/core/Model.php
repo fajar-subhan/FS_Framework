@@ -103,6 +103,22 @@ class Model extends Database
      */
     private $order_by;
 
+    /**
+     * To submit a query sql
+     * 
+     * @var object $query
+     */
+    private $query;
+
+    /**
+     * 
+     * Query result. "object" version
+     * 
+     * @var object $result_object
+     */
+    private $result_object;
+
+
     public function __construct()
     {
         $this->conn = parent::__construct();
@@ -136,7 +152,7 @@ class Model extends Database
      * 
      * Create a select query
      * 
-     * SELECT | FIELD | FROM  | WHERE | WHERE IN | JOIN | LIMIT | ORDER BY
+     * SELECT | FIELD | FROM  | WHERE | WHERE IN 
      * 
      * @return string $sql
      */
@@ -188,7 +204,7 @@ class Model extends Database
          * End FROM {table_name}
          */
         
-        // --------------------------------------------------------------------------------        
+        // --------------------------------------------------------------------------------
         
         /**
          * Start Join
@@ -205,9 +221,12 @@ class Model extends Database
         /**
          * End Join
          */
-        
-         // --------------------------------------------------------------------------------
 
+        // --------------------------------------------------------------------------------
+
+
+        // --------------------------------------------------------------------------------
+        
         /**
          * Start Where 
          */
@@ -299,9 +318,6 @@ class Model extends Database
         /**
          * End Where IN
          */
-        
-
-         // --------------------------------------------------------------------------------
 
         /**
          * Start Order By
@@ -315,7 +331,7 @@ class Model extends Database
          */
 
         // --------------------------------------------------------------------------------
-        
+
         /**
          * Start Limit
          */
@@ -326,7 +342,7 @@ class Model extends Database
         /**
          * End Limit
          */
-
+        
         return $sql;
     }
     
@@ -372,7 +388,14 @@ class Model extends Database
      */
     public function result_array()
     {
-        $this->result_array = $this->run_select()->fetchAll(PDO::FETCH_ASSOC);
+        if(is_object($this->query))
+        {
+            $this->result_array = $this->query->fetchAll(PDO::FETCH_ASSOC);
+        }
+        else 
+        {
+            $this->result_array = $this->run_select()->fetchAll(PDO::FETCH_ASSOC);
+        }
 
         return $this->result_array;
     }
@@ -441,6 +464,27 @@ class Model extends Database
     }
     
     /**
+     * Result All Object
+     * 
+     * Query result. "object" version
+     * 
+     * @return object
+     */
+    public function result_object()
+    {
+        if(is_object($this->query))
+        {   
+            $this->result_object = $this->query->fetchAll(PDO::FETCH_OBJ);
+        }
+        else 
+        {
+            $this->result_object = $this->run_select()->fetchAll(PDO::FETCH_OBJ);
+        }
+
+        return $this->result_object;
+    }
+
+    /**
      * WHERE
      * 
      * Generate the WHERE portion of the query 
@@ -473,7 +517,6 @@ class Model extends Database
         return $this->where;
         
     }   
-
 
     /**
 	 * WHERE IN
@@ -535,7 +578,7 @@ class Model extends Database
         $values = str_repeat('?,',count($array_values)-1) . "?";
 
         $sql = "INSERT INTO $table_name ($field) VALUES ($values)";
-        
+
         $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
 
@@ -609,7 +652,7 @@ class Model extends Database
 
         $sql  = "UPDATE $table_name SET " . implode(",",$set);
         $sql .= " WHERE " . implode('',$where);
-        
+
         $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
 
@@ -650,7 +693,7 @@ class Model extends Database
      * 
      * @param  string $table_name table name to join
      * @param  string $condition  the join on condition
-     * @param  string $type       the join type left | right | outer
+     * @param  string $type       the join type left | right | outer | inner
      * @return array  $this->join
      */
     public function join($table_name,$condition,$type)
@@ -708,7 +751,7 @@ class Model extends Database
         return $this->order_by;
     } 
 
-    /**
+	/**
 	 * Reset Query Builder values.
 	 *
 	 * Publicly-visible method to reset the QB values.
@@ -718,15 +761,51 @@ class Model extends Database
     public function reset_select()
     {
         $data = array(
-            $this->where    = array(),
-            $this->where_in = array(),
-            $this->order_by = "",
-            $this->limit    = ""
+            $this->where        = array(),
+            $this->where_in     = array(),
+            $this->order_by     = "",
+            $this->limit        = "",
+            $this->field_select = array()
         );
 
         foreach($data as $key => $value)
         {
             $this->$key =$value;
+        }
+    }
+
+    /**
+     * This method returns a single result row. If your query has more than one row, 
+     * it returns only the first row. The result is returned as an object. 
+     * 
+     * @return object 
+     */
+    public function row()
+    {
+        return $this->result_object()[0];
+    }
+
+    /**
+     * This function is used to run the query
+     * 
+     * @param string $query
+     * @param array  $bindValue
+     */
+    public function query($query,$bindValue = [])
+    {
+        try 
+        {
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute($bindValue);
+            $this->num_rows = $stmt->rowCount();
+            
+            $this->query = $stmt;
+
+            return $this->query;
+        }
+        catch(PDOException $e)
+        {
+            BaseException::getException($e);
         }
     }
 }
