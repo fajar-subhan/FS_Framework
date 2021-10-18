@@ -447,7 +447,14 @@ class Model extends Database
      */
     public function last_query()
     {
-        return $this->run_select()->queryString;
+        if(is_object($this->query))
+        {
+            return $this->query->queryString;
+        }
+        else 
+        {       
+            return $this->run_select()->queryString;
+        }
     }
 
     /**
