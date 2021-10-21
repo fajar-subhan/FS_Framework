@@ -658,7 +658,7 @@ class Model extends Database
         }
 
         $sql  = "UPDATE $table_name SET " . implode(",",$set);
-        $sql .= " WHERE " . implode('',$where);
+        $sql .= " WHERE " . implode(' AND ',$where);
 
         $this->num_rows = $this->run_query($sql,$array_values)->rowCount();
     }
