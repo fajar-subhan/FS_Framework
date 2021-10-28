@@ -675,7 +675,7 @@ class Model extends Database
         {
             foreach($this->where as $key => $value)
             {
-                $set[$key] = $key . " = ?";
+                $set[$key] = $key . "?";
             }
 
             $array_values = array_values($this->where);
@@ -684,7 +684,7 @@ class Model extends Database
         {
             foreach($data as $key => $value)
             {
-                $set[$key] = $key . " = ?";
+                $set[$key] = $key . "?";
             }
 
             $array_values = array_values($data);
