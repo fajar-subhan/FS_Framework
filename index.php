@@ -1,7 +1,7 @@
 <?php
 
 use app\core\App;
-use app\Core\Request;
+use app\core\Request;
 
 /*
 |--------------------------------------------------------------------------

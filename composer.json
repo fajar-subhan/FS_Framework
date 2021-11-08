@@ -3,7 +3,7 @@
     "description": "A framework that can be redeveloped.Only uses the concept of php oop mvc",
     "license": "MIT",
     "type": "framework",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "authors": [{
         "name": "Fajar Subhan",
         "email": "fajarsubhan9b@gmail.com"

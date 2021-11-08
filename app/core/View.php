@@ -54,6 +54,7 @@ class View
             }
             else 
             {
+                ob_start();
                 require_once  str_replace("\\","/",ROOT_PATH) . "/app/resources/views/layouts/$layout.php"; 
                 $template =  ob_get_clean();
 

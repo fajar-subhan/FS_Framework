@@ -84,7 +84,11 @@ Before starting we prepare a few things first such as config composer, database 
  ```sh
     if(!defined('CONTROLLER')) define('CONTROLLER','Controller Name');
   ```
-6. Happy coding :)
+6. Define the base url in the config/config.php file
+ ```sh
+    if(!defined('BASE_URL')) define('BASE_URL','Hostname or path address');
+  ```
+7. Happy coding :)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

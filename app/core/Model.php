@@ -118,6 +118,13 @@ class Model extends Database
      */
     private $result_object;
 
+    /**
+     * Generate LIKE clause
+     * 
+     * @var array $like
+     */
+    private $like;
+
 
     public function __construct()
     {
@@ -319,6 +326,48 @@ class Model extends Database
          * End Where IN
          */
 
+        // --------------------------------------------------------------------------------
+        
+        /**
+         * Start LIKE
+         */
+        if(!empty($this->like))
+        {
+            if(!empty($this->where))
+            {
+                $sql .= " AND ";
+            }
+
+            if(count($this->like) === 1)
+            {
+                
+                foreach($this->like as $field => $value)
+                {
+                    $like[] = $field . "LIKE '%$value%'";
+                }
+
+                
+                $sql .= implode(" ",$like);
+            }
+            
+            if(count($this->like) > 1)
+            {
+                
+                foreach($this->like as $key => $value)
+                {
+                    $like[]  = $key . "LIKE '%$value%'";
+                }
+
+                $sql .= implode(" AND ",$like);
+            }
+        }
+
+        /**
+         * End LIKE
+         */
+
+         // --------------------------------------------------------------------------------
+        
         /**
          * Start Order By
          */
@@ -423,7 +472,7 @@ class Model extends Database
                 $this->field_select[] = $val;
             }
         }
-
+        
         return $this->field_select;
 
     }
@@ -602,7 +651,6 @@ class Model extends Database
             $stmt = $this->conn->prepare($query);
             $stmt->execute($bindValue);
             $this->num_rows = $stmt->rowCount();
-            
             return $stmt;
         }
         catch(PDOException $e)
@@ -772,7 +820,8 @@ class Model extends Database
             $this->where_in     = array(),
             $this->order_by     = "",
             $this->limit        = "",
-            $this->field_select = array()
+            $this->field_select = array(),
+            $this->like         = array()
         );
 
         foreach($data as $key => $value)
@@ -815,4 +864,49 @@ class Model extends Database
             BaseException::getException($e);
         }
     }
+
+    public function result_array_one()
+    {
+        if(is_object($this->query))
+        {
+            $this->result_array = $this->query->fetch(PDO::FETCH_ASSOC);
+        }
+        else 
+        {
+            $this->result_array = $this->run_select()->fetch(PDO::FETCH_ASSOC);
+        }
+
+        return $this->result_array;
+    }
+
+    /**
+     * Adds a LIKE clause to a query, 
+     * separating multiple calls with AND.
+     * 
+     * @return array $this->like
+     */
+    public function like($field,$value)
+    {
+        $like = explode(' ',$field);
+
+        if(is_array($like) && count($like) > 1)
+        {
+            $field = [implode(' ',$like) => $value];
+        }
+
+        if(is_array($like) && count($like) == 1)
+        {
+            $opr = [$like[0],' '];
+
+            $field = [implode(' ',$opr) => $value];
+        }
+
+        foreach($field as $key => $value)
+        {
+            $this->like[$key] = $value;
+        }
+
+        return $this->like;
+    }
+
 }

@@ -48,9 +48,19 @@ class Router
         $this->request = $request;
     }
 
+    /**
+     * This method is used to retrieve url query string data
+     * 
+     * @return array
+     */
     public function url()
     {
-        return $this->request->getURL();
+        $url = $this->request->getURL();
+
+        if(!empty($url))
+        {
+            return $this->request->getURL();
+        }
     }
     
     /**

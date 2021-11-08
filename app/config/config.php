@@ -10,3 +10,16 @@ require_once './app/helpers/My_Helper.php';
  * 
  */
 if(!defined('CONTROLLER')) define('CONTROLLER','welcome');
+
+/**
+ * Define base url 
+ * 
+ * Example https://www.example.com/ 
+ */
+if(!defined('BASE_URL')) define('BASE_URL','Hostname or path address');
+
+/**
+ * Default time zone Asia/Jakarta 
+ * 
+ */
+date_default_timezone_set('Asia/Jakarta');
